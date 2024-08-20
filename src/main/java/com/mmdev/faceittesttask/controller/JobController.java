@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * REST controller for managing job data.
+ */
 @RestController
 @RequestMapping("/jobs")
 @RequiredArgsConstructor
@@ -23,8 +26,8 @@ public class JobController {
 	/**
 	 * Retrieves all job vacancies with pagination and sorting.
 	 *
-	 * @param pageable The pagination and sorting parameters
-	 * @return A ResponseEntity containing a page of job vacancies and HTTP status
+	 * @param pageable The pagination and sorting parameters.
+	 * @return A ResponseEntity containing a page of job vacancies and HTTP status.
 	 */
 	@GetMapping
 	public ResponseEntity<Page<JobEntity>> getAllJobs(Pageable pageable) {
@@ -35,7 +38,7 @@ public class JobController {
 	/**
 	 * Retrieves the top 10 job vacancies sorted by creation date in descending order.
 	 *
-	 * @return A ResponseEntity containing a list of the 10 most recent job vacancies and HTTP status
+	 * @return A ResponseEntity containing a list of the 10 most recent job vacancies and HTTP status.
 	 */
 	@GetMapping("/top10")
 	public ResponseEntity<List<JobEntity>> getTop10RecentJobs() {
@@ -46,7 +49,7 @@ public class JobController {
 	/**
 	 * Retrieves statistics on job vacancies by location, including the number of jobs in each city.
 	 *
-	 * @return A ResponseEntity containing a list of maps with job statistics and HTTP status
+	 * @return A ResponseEntity containing a list of maps with job statistics and HTTP status.
 	 */
 	@GetMapping("/statistics")
 	public ResponseEntity<List<Map<String, Object>>> getJobCountByLocation() {
@@ -56,9 +59,12 @@ public class JobController {
 
 	/**
 	 * Saves a list of job DTOs to the database.
+	 * <p>
+	 * This endpoint processes the provided job data and updates or inserts job records into the database.
+	 * </p>
 	 *
-	 * @param jobDto The job DTOs to be saved
-	 * @return A ResponseEntity with HTTP status
+	 * @param jobDto The job DTO containing a list of job records to be saved.
+	 * @return A ResponseEntity with HTTP status indicating the result of the operation.
 	 */
 	@PostMapping("/save")
 	public ResponseEntity<Void> saveJobs(@RequestBody JobDto jobDto) {

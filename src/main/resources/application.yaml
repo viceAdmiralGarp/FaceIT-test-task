@@ -16,6 +16,11 @@ spring:
   application:
     name: face-it-test-task
 
+job:
+  api:
+    url: https://www.arbeitnow.com/api/job-board-api
+
 server:
   port: 8081
+
 

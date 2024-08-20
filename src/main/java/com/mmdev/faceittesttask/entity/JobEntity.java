@@ -6,6 +6,14 @@ import lombok.*;
 import java.time.Instant;
 import java.util.List;
 
+
+/**
+ * Entity class representing a job vacancy.
+ * <p>
+ * This entity is mapped to the "jobs" table in the database and holds information about job vacancies,
+ * including details such as the company name, job title, description, location, and other relevant attributes.
+ * </p>
+ */
 @Entity
 @Table(name = "jobs")
 @NoArgsConstructor

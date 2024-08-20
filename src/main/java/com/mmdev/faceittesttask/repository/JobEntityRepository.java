@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Repository interface for managing JobEntity entities.
@@ -49,5 +50,13 @@ public interface JobEntityRepository extends JpaRepository<JobEntity, Long> {
 	 */
 	@Query("SELECT j.location AS city, COUNT(j.id) AS count FROM JobEntity j GROUP BY j.location")
 	List<Map<String, Object>> findJobCountByLocation();
+
+	/**
+	 * Finds a job entity by its slug.
+	 *
+	 * @param slug The slug of the job entity
+	 * @return An optional containing the found job entity or empty if not found
+	 */
+	Optional<JobEntity> findBySlug(String slug);
 
 }
