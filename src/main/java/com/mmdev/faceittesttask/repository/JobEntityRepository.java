@@ -18,7 +18,7 @@ import java.util.Map;
  * </p>
  */
 @Repository
-public interface JobRepository extends JpaRepository<JobEntity, Long> {
+public interface JobEntityRepository extends JpaRepository<JobEntity, Long> {
 
 	/**
 	 * Retrieves all job vacancies with pagination and sorting.

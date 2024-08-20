@@ -1,20 +1,57 @@
 package com.mmdev.faceittesttask.service;
 
 import com.mmdev.faceittesttask.entity.JobEntity;
+import com.mmdev.faceittesttask.model.JobDto;
+import com.mmdev.faceittesttask.repository.JobEntityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import com.mmdev.faceittesttask.repository.JobRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class JobService {
 
-	private final JobRepository jobRepository;
+	private final JobEntityRepository jobEntityRepository;
+
+
+	/**
+	 * Saves a list of job entities to the database.
+	 *
+	 * @param jobs List of job DTOs to be saved
+	 */
+	public void saveJobs(List<JobDto.Job> jobs) {
+		List<JobEntity> jobEntities = jobs.stream()
+				.map(this::convertToEntity)
+				.collect(Collectors.toList());
+
+		jobEntityRepository.saveAll(jobEntities);
+	}
+
+	/**
+	 * Converts JobDto.Job to JobEntity.
+	 *
+	 * @param jobDTO The job DTO to convert
+	 * @return The corresponding JobEntity
+	 */
+	private JobEntity convertToEntity(JobDto.Job jobDTO) {
+		JobEntity jobEntity = new JobEntity();
+		jobEntity.setSlug(jobDTO.slug());
+		jobEntity.setCompanyName(jobDTO.companyName());
+		jobEntity.setTitle(jobDTO.title());
+		jobEntity.setDescription(jobDTO.description());
+		jobEntity.setRemote(jobDTO.remote());
+		jobEntity.setUrl(jobDTO.url());
+		jobEntity.setTags(jobDTO.tags());
+		jobEntity.setJobTypes(jobDTO.jobTypes());
+		jobEntity.setLocation(jobDTO.location());
+		jobEntity.setCreatedAt(jobDTO.createdAt());
+		return jobEntity;
+	}
 
 	/**
 	 * Retrieves all job vacancies with pagination and sorting.
@@ -23,7 +60,7 @@ public class JobService {
 	 * @return A page of job vacancies that match the specified parameters
 	 */
 	public Page<JobEntity> getAllJobs(Pageable pageable) {
-		return jobRepository.findAll(pageable);
+		return jobEntityRepository.findAll(pageable);
 	}
 
 	/**
@@ -35,7 +72,7 @@ public class JobService {
 	 * @return A list of the 10 most recent job vacancies
 	 */
 	public List<JobEntity> getTop10RecentJobs() {
-		return jobRepository.findTop10ByOrderByCreatedAtDesc();
+		return jobEntityRepository.findTop10ByOrderByCreatedAtDesc();
 	}
 
 	/**
@@ -48,6 +85,6 @@ public class JobService {
 	 *         Map keys: "city" (the city), "count" (the number of jobs)
 	 */
 	public List<Map<String, Object>> getJobCountByLocation() {
-		return jobRepository.findJobCountByLocation();
+		return jobEntityRepository.findJobCountByLocation();
 	}
 }

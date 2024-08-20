@@ -6,7 +6,7 @@ spring:
     password: admin
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     database-platform: org.hibernate.dialect.H2Dialect
   h2:
     console:
@@ -18,3 +18,4 @@ spring:
 
 server:
   port: 8081
+
