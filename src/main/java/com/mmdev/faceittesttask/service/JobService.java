@@ -1,20 +1,22 @@
 package com.mmdev.faceittesttask.service;
 
-import com.mmdev.faceittesttask.entity.JobEntity;
-import com.mmdev.faceittesttask.model.JobDto;
-import com.mmdev.faceittesttask.repository.JobEntityRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import static java.util.concurrent.TimeUnit.HOURS;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import com.mmdev.faceittesttask.client.JobApiClient;
+import com.mmdev.faceittesttask.entity.JobEntity;
+import com.mmdev.faceittesttask.model.JobDto;
+import com.mmdev.faceittesttask.repository.JobEntityRepository;
+
+import lombok.RequiredArgsConstructor;
 
 /**
  * Service class for managing job data.
@@ -24,10 +26,7 @@ import java.util.stream.Collectors;
 public class JobService {
 
 	private final JobEntityRepository jobEntityRepository;
-	private final RestTemplate restTemplate;
-
-	@Value("${job.api.url}")
-	private String jobApiUrl;
+	private final JobApiClient jobApiClient;
 
 	/**
 	 * Fetches job data from the external API and saves or updates the job entries in the database.
@@ -36,10 +35,9 @@ public class JobService {
 	 * API URL, converts the retrieved DTOs to entity objects, and then updates or saves these entities in the database.
 	 * </p>
 	 */
-	@Scheduled(fixedRate = 3600000) // every hour
+	@Scheduled(fixedRate = 1, timeUnit = HOURS)
 	public void fetchAndSaveJobs() {
-		ResponseEntity<JobDto> response = restTemplate.getForEntity(jobApiUrl, JobDto.class);
-		JobDto jobDto = response.getBody();
+		JobDto jobDto = jobApiClient.getJobs();
 
 		if (jobDto != null) {
 			List<JobEntity> newJobs = jobDto.data().stream()
@@ -64,20 +62,10 @@ public class JobService {
 		for (JobEntity newJob : newJobs) {
 			jobEntityRepository.findBySlug(newJob.getSlug()).ifPresentOrElse(
 					existingJob -> {
-						existingJob.setCompanyName(newJob.getCompanyName());
-						existingJob.setTitle(newJob.getTitle());
-						existingJob.setDescription(newJob.getDescription());
-						existingJob.setRemote(newJob.isRemote());
-						existingJob.setUrl(newJob.getUrl());
-						existingJob.setTags(newJob.getTags());
-						existingJob.setJobTypes(newJob.getJobTypes());
-						existingJob.setLocation(newJob.getLocation());
-						existingJob.setCreatedAt(newJob.getCreatedAt());
-						jobEntityRepository.save(existingJob);
-					},
-					() -> {
+						newJob.setId(existingJob.getId());
 						jobEntityRepository.save(newJob);
-					}
+					},
+					() -> jobEntityRepository.save(newJob)
 			);
 		}
 	}
