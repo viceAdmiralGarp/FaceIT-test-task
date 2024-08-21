@@ -71,4 +71,21 @@ public class JobController {
 		jobService.saveJobs(jobDto.data());
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
+
+	/**
+	 * Updates existing job entries in the database or inserts new ones if they don't exist.
+	 * <p>
+	 * This endpoint processes the provided job data and performs an update operation.
+	 * If a job with the same slug already exists in the database, its details are updated.
+	 * If no such job exists, a new job entry is created.
+	 * </p>
+	 *
+	 * @param jobDto The job DTO containing a list of job records to be updated or inserted.
+	 * @return A ResponseEntity with HTTP status indicating the result of the operation.
+	 */
+	@PutMapping("/update")
+	public ResponseEntity<Void> updateJobs(@RequestBody JobDto jobDto) {
+		jobService.saveJobs(jobDto.data());
+		return ResponseEntity.status(HttpStatus.OK).build();
+	}
 }

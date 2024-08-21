@@ -46,7 +46,6 @@ public class JobService {
 					.map(this::convertToEntity)
 					.collect(Collectors.toList());
 
-			// Updating the database with new data
 			saveOrUpdateJobs(newJobs);
 		}
 	}
@@ -65,7 +64,6 @@ public class JobService {
 		for (JobEntity newJob : newJobs) {
 			jobEntityRepository.findBySlug(newJob.getSlug()).ifPresentOrElse(
 					existingJob -> {
-						// Updating an existing entry
 						existingJob.setCompanyName(newJob.getCompanyName());
 						existingJob.setTitle(newJob.getTitle());
 						existingJob.setDescription(newJob.getDescription());
@@ -78,7 +76,6 @@ public class JobService {
 						jobEntityRepository.save(existingJob);
 					},
 					() -> {
-						// Save new job
 						jobEntityRepository.save(newJob);
 					}
 			);
