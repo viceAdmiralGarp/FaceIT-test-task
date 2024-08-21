@@ -38,36 +38,33 @@ public class JobService {
 	@Scheduled(fixedRate = 1, timeUnit = HOURS)
 	public void fetchAndSaveJobs() {
 		JobDto jobDto = jobApiClient.findJobs();
+		convertAndSave(jobDto);
+	}
 
-		if (jobDto != null) {
-			List<JobEntity> newJobs = jobDto.data().stream()
-					.map(this::convertToEntity)
-					.collect(Collectors.toList());
-
-			saveOrUpdateJobs(newJobs);
-		}
+	/**
+	 * Fetches job data from the external API and saves the job entries in the database.
+	 * <p>
+	 * This method retrieves job data from the specified API URL by page number, converts the retrieved DTOs to entity objects,
+	 * and then updates or saves these entities in the database.
+	 * </p>
+	 *
+	 * @param pageNumber The page number from which to fetch job data.
+	 */
+	public void fetchAndSaveJobs(Integer pageNumber) {
+		JobDto jobDto = jobApiClient.findJobs(pageNumber);
+		convertAndSave(jobDto);
 	}
 
 	/**
 	 * Saves new job entities to the database or updates existing ones.
 	 * <p>
-	 * This method iterates through the list of new job entities. For each job entity, it checks if a job with the
-	 * same slug already exists in the database. If it does, it updates the existing job entry with the new data.
-	 * If it does not exist, it saves the new job entry to the database.
+	 * This method iterates through the list of new job entities and stores them into DB.
 	 * </p>
 	 *
 	 * @param newJobs A list of new job entities to be saved or updated.
 	 */
-	public void saveOrUpdateJobs(List<JobEntity> newJobs) {
-		for (JobEntity newJob : newJobs) {
-			jobEntityRepository.findBySlug(newJob.getSlug()).ifPresentOrElse(
-					existingJob -> {
-						newJob.setId(existingJob.getId());
-						jobEntityRepository.save(newJob);
-					},
-					() -> jobEntityRepository.save(newJob)
-			);
-		}
+	public void saveAll(List<JobEntity> newJobs) {
+		jobEntityRepository.saveAll(newJobs);
 	}
 
 	/**
@@ -83,7 +80,20 @@ public class JobService {
 				.map(this::convertToEntity)
 				.collect(Collectors.toList());
 
-		saveOrUpdateJobs(jobEntities);
+		saveAll(jobEntities);
+	}
+
+	private List<JobEntity> convertResponse(JobDto jobDto) {
+		return jobDto.data().stream()
+				.map(this::convertToEntity)
+				.collect(Collectors.toList());
+	}
+
+	private void convertAndSave(JobDto jobDto) {
+		if (jobDto != null) {
+			List<JobEntity> newJobs = convertResponse(jobDto);
+			saveAll(newJobs);
+		}
 	}
 
 	/**

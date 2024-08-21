@@ -20,13 +20,21 @@ public class JobApiClient {
     @Value("${job.api.url}")
     private String jobApiUrl;
 
+    private final static String PAGE_QUERY_PARAM = "page";
+    private final static String SORT_BY_QUERY_PARAM = "sort_by";
+
     public JobDto findJobs() {
         ResponseEntity<JobDto> response = restTemplate.getForEntity(jobApiUrl, JobDto.class);
         return response.getBody();
     }
 
+    public JobDto findJobs(Integer pageNumber) {
+        ResponseEntity<JobDto> response = restTemplate.getForEntity(jobApiUrl, JobDto.class, Map.of(PAGE_QUERY_PARAM, pageNumber));
+        return response.getBody();
+    }
+
     public JobDto findTop10ByRelevance() {
-        ResponseEntity<JobDto> response = restTemplate.getForEntity(jobApiUrl, JobDto.class, Map.of("sort_by", "relevance"));
+        ResponseEntity<JobDto> response = restTemplate.getForEntity(jobApiUrl, JobDto.class, Map.of(SORT_BY_QUERY_PARAM, "relevance"));
         return response.getBody();
     }
 }

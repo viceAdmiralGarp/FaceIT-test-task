@@ -28,7 +28,7 @@ public class JobEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "slug", nullable = false, unique = true)
+	@Column(name = "slug", nullable = false)
 	private String slug;
 
 	@Column(name = "company_name")

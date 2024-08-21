@@ -28,7 +28,8 @@ public class JobController {
 	/**
 	 * Retrieves all job vacancies with pagination and sorting.
 	 *
-	 * @param pageable The pagination and sorting parameters.
+	 * @param pageNumber The page number.
+	 * @param pageSize The page size.
 	 * @return A ResponseEntity containing a page of job vacancies and HTTP status.
 	 */
 	@GetMapping
