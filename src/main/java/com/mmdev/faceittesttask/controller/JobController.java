@@ -4,8 +4,10 @@ import com.mmdev.faceittesttask.entity.JobEntity;
 import com.mmdev.faceittesttask.model.JobDto;
 import com.mmdev.faceittesttask.service.JobService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
+
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +32,8 @@ public class JobController {
 	 * @return A ResponseEntity containing a page of job vacancies and HTTP status.
 	 */
 	@GetMapping
-	public ResponseEntity<Page<JobEntity>> getAllJobs(Pageable pageable) {
-		Page<JobEntity> jobsPage = jobService.getAllJobs(pageable);
+	public ResponseEntity<Page<JobEntity>> getAllJobs(@RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
+		Page<JobEntity> jobsPage = jobService.getAllJobs(PageRequest.of(pageNumber, pageSize, Sort.by("createdAt")));
 		return ResponseEntity.ok(jobsPage);
 	}
 
@@ -41,9 +43,8 @@ public class JobController {
 	 * @return A ResponseEntity containing a list of the 10 most recent job vacancies and HTTP status.
 	 */
 	@GetMapping("/top10")
-	public ResponseEntity<List<JobEntity>> getTop10RecentJobs() {
-		List<JobEntity> top10Jobs = jobService.getTop10RecentJobs();
-		return ResponseEntity.ok(top10Jobs);
+	public ResponseEntity<JobDto> getTop10RecentJobs() {
+		return ResponseEntity.ok(jobService.findTop10ByRelevance());
 	}
 
 	/**

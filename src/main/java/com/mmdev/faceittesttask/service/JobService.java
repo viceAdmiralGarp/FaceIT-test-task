@@ -37,7 +37,7 @@ public class JobService {
 	 */
 	@Scheduled(fixedRate = 1, timeUnit = HOURS)
 	public void fetchAndSaveJobs() {
-		JobDto jobDto = jobApiClient.getJobs();
+		JobDto jobDto = jobApiClient.findJobs();
 
 		if (jobDto != null) {
 			List<JobEntity> newJobs = jobDto.data().stream()
@@ -129,8 +129,8 @@ public class JobService {
 	 *
 	 * @return A list of the 10 most recent job vacancies.
 	 */
-	public List<JobEntity> getTop10RecentJobs() {
-		return jobEntityRepository.findTop10ByOrderByCreatedAtDesc();
+	public JobDto findTop10ByRelevance() {
+		return jobApiClient.findTop10ByRelevance();
 	}
 
 	/**
